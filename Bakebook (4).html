@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Bakebook</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --a:#8B6914;--a-bg:#FBF4E4;--a-border:#DCC87A;
+  --text:#1C1208;--muted:#7D6B4F;--hint:#A89880;
+  --border:#E5DDD0;--surf:#FFFFFF;--bg:#F5F2ED;
+  --red:#B83232;--red-bg:#FBE8E8;
+  --r:14px;--rm:8px;--hdr:54px
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;min-height:100vh}
+#wrap{max-width:480px;margin:0 auto}
+@media(min-width:520px){
+  body{background:#DDD5C8;padding:24px 0 40px}
+  #wrap{border-radius:28px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.18);min-height:auto}
+}
+/* ── auth screen ── */
+.auth-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:24px;background:var(--bg)}
+.auth-logo{font-size:54px;margin-bottom:10px}
+.auth-title{font-size:24px;font-weight:500;margin-bottom:4px}
+.auth-sub{font-size:14px;color:var(--muted);margin-bottom:28px;text-align:center;line-height:1.5}
+.auth-box{background:var(--surf);border:.5px solid var(--border);border-radius:var(--r);
+  padding:22px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:0}
+.auth-err{font-size:13px;color:var(--red);min-height:18px;margin:6px 0 2px}
+.auth-ok{font-size:13px;color:#2d6a2d;min-height:18px;margin:6px 0 2px}
+.auth-divider{text-align:center;font-size:12px;color:var(--hint);margin:10px 0}
+/* ── topbar ── */
+.bar{position:sticky;top:0;z-index:90;background:var(--surf);border-bottom:.5px solid var(--border);
+  height:var(--hdr);display:flex;align-items:center;justify-content:space-between;padding:0 16px}
+.bar-title{font-size:17px;font-weight:500;display:flex;align-items:center;gap:7px}
+.bar-title i{color:var(--a);font-size:20px}
+.bar-r{display:flex;gap:6px;align-items:center}
+.user-badge{font-size:12px;color:var(--hint);max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-amber{background:var(--a);color:#fff;border:none;border-radius:var(--rm);
+  padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer;
+  display:flex;align-items:center;gap:5px;font-family:inherit;white-space:nowrap}
+.btn-ghost{background:none;border:.5px solid var(--border);border-radius:var(--rm);
+  padding:7px 12px;font-size:13px;cursor:pointer;color:var(--muted);
+  display:flex;align-items:center;gap:4px;font-family:inherit}
+.btn-icon{background:none;border:none;cursor:pointer;padding:8px;
+  color:var(--muted);display:flex;align-items:center;font-size:20px}
+.btn-full{width:100%;padding:12px;font-size:15px;justify-content:center}
+/* ── home ── */
+.tl{overflow-x:auto;padding:14px 16px 4px;scrollbar-width:none;border-bottom:.5px solid var(--border)}
+.tl::-webkit-scrollbar{display:none}
+.tl-inner{display:flex;align-items:flex-start;width:max-content}
+.tl-item{display:flex;align-items:flex-start;cursor:pointer}
+.tl-dot-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 8px}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--a);flex-shrink:0}
+.tl-line{height:1px;background:var(--border);flex-shrink:0;margin-top:14px;width:28px}
+.tl-label{font-size:10px;color:var(--hint);white-space:nowrap;text-align:center;margin-top:2px}
+.tl-name{font-size:11px;font-weight:500;color:var(--muted);max-width:64px;
+  text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grid{padding:14px 12px 24px;display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surf);border-radius:var(--r);border:.5px solid var(--border);overflow:hidden;cursor:pointer}
+.card-img{height:200px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.card-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.card-img-icon{font-size:52px;color:rgba(255,255,255,.7);z-index:1}
+.card-badge{position:absolute;top:10px;right:10px;background:rgba(0,0,0,.45);
+  color:#fff;border-radius:10px;padding:2px 8px;font-size:11px;z-index:2}
+.card-body{padding:13px 15px 15px}
+.card-title{font-size:16px;font-weight:500;margin-bottom:6px;line-height:1.3}
+.card-meta{display:flex;gap:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.card-meta span{display:flex;align-items:center;gap:3px}
+.card-meta i{font-size:13px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 24px;text-align:center;gap:12px}
+.empty i{font-size:52px;color:var(--border)}
+.empty-title{font-size:18px;font-weight:500}
+.empty-sub{font-size:14px;color:var(--muted);line-height:1.5}
+/* ── detail ── */
+.gallery{position:relative;background:var(--a-bg)}
+.gallery img{width:100%;height:260px;object-fit:cover;display:block}
+.gallery-empty{height:200px;display:flex;align-items:center;justify-content:center;
+  background:var(--a-bg);font-size:64px}
+.gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);
+  background:rgba(0,0,0,.42);color:#fff;border:none;border-radius:50%;
+  width:34px;height:34px;cursor:pointer;font-size:18px;
+  display:flex;align-items:center;justify-content:center}
+.gallery-arrow.prev{left:10px}.gallery-arrow.next{right:10px}
+.gallery-count{position:absolute;bottom:10px;right:12px;
+  background:rgba(0,0,0,.45);color:#fff;border-radius:10px;padding:2px 8px;font-size:12px}
+.thumb-strip{display:flex;gap:6px;overflow-x:auto;padding:8px 14px;
+  scrollbar-width:none;background:var(--surf);border-bottom:.5px solid var(--border)}
+.thumb-strip::-webkit-scrollbar{display:none}
+.thumb-img{width:52px;height:52px;border-radius:var(--rm);object-fit:cover;
+  flex-shrink:0;cursor:pointer;border:2px solid transparent}
+.thumb-img.active{border-color:var(--a)}
+.detail-body{padding:16px 16px 32px;background:var(--bg)}
+.detail-title{font-size:22px;font-weight:500;line-height:1.2;margin-bottom:6px}
+.detail-desc{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:10px}
+.detail-source{font-size:13px;margin-bottom:16px;display:flex;align-items:center;gap:5px}
+.detail-source a{color:var(--a);text-decoration:none}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:20px}
+.stat-box{background:var(--surf);border:.5px solid var(--border);border-radius:var(--rm);
+  padding:10px 6px;text-align:center}
+.stat-icon{font-size:16px;color:var(--a);display:block;margin-bottom:3px}
+.stat-val{font-size:13px;font-weight:500;display:block}
+.stat-lbl{font-size:10px;color:var(--hint);display:block;margin-top:1px}
+.section-title{font-size:13px;font-weight:500;text-transform:uppercase;
+  letter-spacing:.5px;color:var(--hint);margin-bottom:10px}
+.ing-list{background:var(--surf);border-radius:var(--r);border:.5px solid var(--border);overflow:hidden;margin-bottom:20px}
+.ing-row{display:flex;align-items:center;padding:11px 14px;border-bottom:.5px solid var(--border)}
+.ing-row:last-child{border-bottom:none}
+.ing-dot{width:6px;height:6px;border-radius:50%;background:var(--a);flex-shrink:0;margin-right:10px}
+.ing-amt{font-family:monospace;font-size:13px;color:var(--a);min-width:58px;margin-right:8px}
+.ing-name{font-size:14px}
+.steps{position:relative;margin-bottom:20px}
+.step-line{position:absolute;left:18px;top:16px;bottom:16px;width:1px;background:var(--border)}
+.step-item{display:flex;gap:12px;margin-bottom:12px}
+.step-left{display:flex;flex-direction:column;align-items:center;width:38px;flex-shrink:0}
+.step-dot{width:12px;height:12px;border-radius:50%;background:var(--a-bg);
+  border:2px solid var(--a);z-index:1;margin-top:10px;flex-shrink:0}
+.step-time{font-size:10px;color:var(--hint);font-family:monospace;margin-top:3px;white-space:nowrap}
+.step-card{flex:1;background:var(--surf);border:.5px solid var(--border);border-radius:var(--rm);padding:10px 12px}
+.step-num{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;color:var(--hint);margin-bottom:3px}
+.step-desc{font-size:14px;line-height:1.5;color:var(--text)}
+.step-dur{float:right;background:var(--a-bg);border-radius:5px;padding:2px 7px;font-size:11px;color:var(--a);font-weight:500;margin-left:8px}
+.step-tip{font-size:12px;color:#4a6a2a;background:#eef5e6;border-radius:6px;padding:5px 8px;margin-top:6px;clear:both}
+.notes-box{background:var(--surf);border:.5px solid var(--border);border-radius:var(--rm);
+  padding:13px 15px;font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:16px}
+.tags-row{display:flex;gap:7px;flex-wrap:wrap}
+.tag{background:var(--a-bg);border:.5px solid var(--a-border);color:var(--a);border-radius:20px;padding:4px 11px;font-size:12px}
+/* ── form ── */
+.form-body{padding:16px;display:flex;flex-direction:column;gap:0}
+.fsec{background:var(--surf);border-radius:var(--r);border:.5px solid var(--border);padding:16px;margin-bottom:12px}
+.fsec-title{font-size:15px;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.fsec-desc{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.4}
+.drop-zone{border:1.5px dashed var(--border);border-radius:var(--rm);
+  padding:24px 16px;text-align:center;cursor:pointer;color:var(--muted);font-size:14px}
+.drop-zone:active{background:var(--a-bg)}
+.drop-zone i{font-size:28px;display:block;margin-bottom:6px;color:var(--hint)}
+.thumb-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.form-thumb{position:relative;width:72px;height:72px}
+.form-thumb img{width:100%;height:100%;object-fit:cover;border-radius:var(--rm);border:.5px solid var(--border)}
+.form-thumb-del{position:absolute;top:-5px;right:-5px;width:18px;height:18px;
+  border-radius:50%;background:var(--red);color:#fff;border:none;cursor:pointer;
+  font-size:11px;display:flex;align-items:center;justify-content:center}
+.flabel{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.4px;
+  color:var(--hint);display:block;margin-bottom:5px;margin-top:12px}
+.flabel:first-child{margin-top:0}
+input[type=text],input[type=url],input[type=email],input[type=password],
+input[type=date],input[type=number],textarea,select{
+  width:100%;border:.5px solid var(--border);border-radius:var(--rm);
+  padding:12px;font-size:16px;color:var(--text);background:var(--bg);
+  font-family:inherit;outline:none;-webkit-appearance:none}
+input:focus,textarea:focus,select:focus{border-color:var(--a);background:var(--surf);
+  box-shadow:0 0 0 3px rgba(139,105,20,.1)}
+textarea{resize:vertical;min-height:80px}
+.nums-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.status-line{font-size:13px;padding:9px 12px;border-radius:var(--rm);margin-top:10px}
+.s-info{background:var(--a-bg);color:#7D5A00}
+.s-ok{background:#eaf5ea;color:#245724}
+.s-err{background:var(--red-bg);color:var(--red)}
+.ing-edit-row{display:flex;gap:6px;margin-bottom:8px;align-items:center}
+.ing-edit-row .w-amt{width:64px;flex-shrink:0}
+.ing-edit-row .w-unit{width:72px;flex-shrink:0}
+.step-edit{background:var(--bg);border:.5px solid var(--border);border-radius:var(--rm);padding:12px;margin-bottom:10px}
+.step-edit-row{display:flex;gap:6px;align-items:flex-start}
+.step-num-badge{width:24px;height:24px;border-radius:50%;background:var(--a-bg);
+  color:var(--a);font-size:12px;font-weight:500;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:10px}
+.add-row-btn{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--a);
+  background:none;border:none;cursor:pointer;padding:4px 0;font-family:inherit}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--red);font-size:20px;
+  padding:0 2px;flex-shrink:0;display:flex;align-items:center;line-height:1}
+.loading-screen{display:flex;align-items:center;justify-content:center;
+  min-height:100vh;font-size:15px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="app"><div class="loading-screen" id="loading-msg">Opening your cookbook…</div></div></div>
+<!-- If the module script fails to load within 10 s, show a helpful message -->
+<script>
+setTimeout(()=>{
+  const el=document.getElementById('loading-msg')
+  if(el)el.innerHTML='Taking longer than usual…<br><small style="font-size:13px;color:#A89880">Try refreshing. If it keeps happening, check the browser console for errors.</small>'
+},10000)
+</script>
+<script type="module">
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+// ── ⚠️  REPLACE THESE TWO VALUES WITH YOUR PROJECT'S CREDENTIALS ──────────
+// Supabase dashboard → Settings → API
+const SUPABASE_URL      = 'https://kgvvxcjipccaryymiaxm.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_qpi11mnkOALfBvki4Jr9Ng_jNj6w73v'
+// ──────────────────────────────────────────────────────────────────────────
+
+const supabase=createClient(SUPABASE_URL,SUPABASE_ANON_KEY)
+
+// ── utilities ─────────────────────────────────────────────────────────────
+const $=id=>document.getElementById(id)
+const genId=()=>'r'+Date.now()+Math.random().toString(36).slice(2,6)
+const today=()=>new Date().toISOString().split('T')[0]
+const fmtDate=d=>{try{return new Date(d+'T12:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'short'})}catch{return d}}
+const fmtTime=m=>{if(!m||m<=0)return'—';const h=Math.floor(m/60),n=m%60;return h?`${h}h${n?` ${n}m`:''}`:`${n}m`}
+const placeholderColors=[
+  {bg:'#FBF4E4',icon:'#C49A2A'},{bg:'#E8F0F5',icon:'#4A7FA5'},
+  {bg:'#EAF0E8',icon:'#4A7A3A'},{bg:'#F5EAF0',icon:'#A04A7A'}
+]
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+
+// ── Supabase DB ───────────────────────────────────────────────────────────
+// All recipes stored as {id, user_id, created_at, data: <full recipe JSON>}
+// This avoids column-mapping issues and keeps the schema simple.
+const db={
+  async idx(){
+    const{data,error}=await supabase.from('recipes')
+      .select('id,data').order('created_at',{ascending:false})
+    if(error)throw error
+    return(data||[]).map(r=>({...r.data,id:r.id}))
+  },
+  async load(id){
+    const{data,error}=await supabase.from('recipes')
+      .select('data').eq('id',id).single()
+    if(error)throw error
+    return data?{...data.data,id}:null
+  },
+  async save(recipe){
+    const{error}=await supabase.from('recipes').upsert({
+      id:recipe.id,
+      user_id:currentUser.id,
+      data:recipe
+    })
+    if(error)throw error
+  },
+  async del(id){
+    const{error}=await supabase.from('recipes').delete().eq('id',id)
+    if(error)throw error
+  }
+}
+
+// ── Image: read file → compress → ready for upload ────────────────────────
+const readAndCompress=file=>new Promise((res,rej)=>{
+  if(!file.type.startsWith('image/')){rej(new Error(file.name+' is not an image'));return}
+  const fr=new FileReader()
+  fr.onerror=()=>rej(new Error('Could not read '+file.name))
+  fr.onload=e=>{
+    const raw=e.target.result
+    const img=new Image()
+    img.onerror=()=>{const p=raw.split(',');res({dataUrl:raw,base64:p[1],mime:file.type,isNew:true,sizeKB:Math.round(raw.length*.75/1024)})}
+    img.onload=()=>{
+      try{
+        // 500 px keeps recipe text readable while staying well under iOS Safari's
+        // fetch body limit — typical screenshot goes from 3 MB down to ~50 KB
+        const MAX=500;let w=img.width,h=img.height
+        if(w>MAX){h=Math.round(h*MAX/w);w=MAX}
+        if(h>MAX){w=Math.round(w*MAX/h);h=MAX}
+        const c=document.createElement('canvas')
+        c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h)
+        const compressed=c.toDataURL('image/jpeg',.65)
+        const p=compressed.split(',')
+        res({dataUrl:compressed,base64:p[1],mime:'image/jpeg',isNew:true,sizeKB:Math.round(compressed.length*.75/1024)})
+      }catch{const p=raw.split(',');res({dataUrl:raw,base64:p[1],mime:file.type,isNew:true,sizeKB:0})}
+    }
+    img.src=raw
+  }
+  fr.readAsDataURL(file)
+})
+
+// ── Upload images to Supabase Storage, return public URLs ─────────────────
+async function uploadImages(formFiles){
+  const urls=[]
+  for(const f of formFiles){
+    if(!f.isNew){
+      // Already a Supabase URL — keep it
+      urls.push(f.url||f.dataUrl)
+      continue
+    }
+    // Convert base64 → Blob and upload
+    const bytes=atob(f.base64)
+    const arr=new Uint8Array(bytes.length)
+    for(let i=0;i<bytes.length;i++)arr[i]=bytes.charCodeAt(i)
+    const blob=new Blob([arr],{type:'image/jpeg'})
+    const path=`${currentUser.id}/${Date.now()}-${Math.random().toString(36).slice(2,7)}.jpg`
+    const{error}=await supabase.storage.from('recipe-images').upload(path,blob)
+    if(error)throw new Error('Image upload failed: '+error.message)
+    const{data:{publicUrl}}=supabase.storage.from('recipe-images').getPublicUrl(path)
+    urls.push(publicUrl)
+  }
+  return urls
+}
+
+// ── Claude API ────────────────────────────────────────────────────────────
+const SCHEMA='{"title":"","description":"","source":"","servings":4,"bakingTime":45,"calories":200,"ingredients":[{"name":"flour","amount":"200","unit":"g"}],"steps":[{"order":1,"description":"Preheat oven to 180°C","duration":10,"tip":""}],"notes":"","tags":[]}'
+
+function extractJSON(text){
+  let depth=0,start=-1
+  for(let i=0;i<text.length;i++){
+    if(text[i]==='{'){if(depth++===0)start=i}
+    else if(text[i]==='}'){if(--depth===0)return JSON.parse(text.slice(start,i+1))}
+  }
+  throw new Error('No JSON found. Claude said: '+text.slice(0,120))
+}
+
+async function callClaude(messages,maxTokens=1500){
+  let body
+  try{body=JSON.stringify({model:'claude-sonnet-4-6',max_tokens:maxTokens,messages})}
+  catch(e){throw new Error('Request too large')}
+  // Use XMLHttpRequest instead of fetch — iOS Safari throws "Load failed" on
+  // fetch() with large bodies, but XHR handles the same payload fine.
+  return new Promise((resolve,reject)=>{
+    const xhr=new XMLHttpRequest()
+    xhr.open('POST','https://api.anthropic.com/v1/messages')
+    xhr.setRequestHeader('Content-Type','application/json')
+    xhr.timeout=90000 // 90 s — image extraction can be slow on mobile connections
+    xhr.onload=()=>{
+      try{
+        const d=JSON.parse(xhr.responseText)
+        if(d.error){reject(new Error(d.error.message));return}
+        resolve((d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join(''))
+      }catch(e){reject(new Error('Could not parse API response'))}
+    }
+    xhr.onerror=()=>reject(new Error('Network error — check your connection and try again'))
+    xhr.ontimeout=()=>reject(new Error('Timed out — try the "Paste text" option instead'))
+    xhr.send(body)
+  })
+}
+
+async function extractFromImages(fileObjs){
+  const imgs=fileObjs.map(f=>({type:'image',source:{type:'base64',media_type:f.mime||'image/jpeg',data:f.base64}}))
+  const text=await callClaude([{role:'user',content:[...imgs,{type:'text',text:`Extract the complete baking recipe from these ${fileObjs.length} image(s). If Chinese (小红书), translate to English. Look across all images.\nReturn ONLY raw JSON:\n${SCHEMA}`}]}],2000)
+  return extractJSON(text)
+}
+
+async function extractFromText(t){
+  const text=await callClaude([{role:'user',content:`Extract the baking recipe. Translate to English if needed.\nReturn ONLY raw JSON:\n${SCHEMA}\n\nText:\n---\n${t}\n---`}],2000)
+  return extractJSON(text)
+}
+
+// ── app state ─────────────────────────────────────────────────────────────
+let currentUser=null
+let S={view:'home',recipes:[],recipe:null,form:null,formFiles:[],imgIndex:0,scanStatus:'',scanErr:''}
+
+const refresh=async()=>{S.recipes=await db.idx()}
+
+// ── auth ──────────────────────────────────────────────────────────────────
+function setAuthMsg(msg,type='err'){
+  const el=$('auth-msg')
+  if(!el)return
+  el.textContent=msg
+  el.className=type==='ok'?'auth-ok':'auth-err'
+}
+
+async function signIn(){
+  const email=($('auth-email')||{}).value?.trim()
+  const pwd=($('auth-pwd')||{}).value
+  if(!email||!pwd){setAuthMsg('Enter your email and password.');return}
+  setAuthMsg('')
+  const{error}=await supabase.auth.signInWithPassword({email,password:pwd})
+  if(error)setAuthMsg(error.message)
+}
+
+async function signUp(){
+  const email=($('auth-email')||{}).value?.trim()
+  const pwd=($('auth-pwd')||{}).value
+  if(!email||!pwd){setAuthMsg('Enter your email and password.');return}
+  if(pwd.length<6){setAuthMsg('Password must be at least 6 characters.');return}
+  setAuthMsg('')
+  const{error}=await supabase.auth.signUp({email,password:pwd})
+  if(error)setAuthMsg(error.message)
+  else setAuthMsg('Check your email to confirm your account — then sign in.','ok')
+}
+
+async function signOut(){await supabase.auth.signOut()}
+
+// ── navigation ────────────────────────────────────────────────────────────
+async function go(view,data){
+  if(view==='home'){
+    S.view='home';S.recipe=null
+    try{await refresh()}catch(e){console.error('Load error:',e)}
+    render()
+  }else if(view==='detail'){
+    S.view='detail';S.recipe=data;S.imgIndex=0;render()
+  }else if(view==='add'){
+    S.view='form';S.form=blankRecipe();S.formFiles=[];S.scanStatus='';S.scanErr='';render()
+  }else if(view==='edit'){
+    S.view='form';S.form={...data}
+    // Existing images: mark as not-new so they aren't re-uploaded
+    S.formFiles=(data.images||[]).map(url=>({dataUrl:url,url,isNew:false,base64:null,mime:null,sizeKB:null}))
+    S.scanStatus='';S.scanErr='';render()
+  }
+}
+
+async function openRecipe(id){
+  try{const r=await db.load(id);if(r)go('detail',r)}
+  catch(e){alert('Could not load recipe: '+e.message)}
+}
+
+function blankRecipe(){
+  return{id:genId(),title:'',description:'',source:'',date:today(),bakingTime:30,servings:4,calories:0,
+    images:[],tags:[],ingredients:[{id:genId(),name:'',amount:'',unit:'g'}],
+    steps:[{id:genId(),order:1,description:'',duration:15,tip:''}],notes:''}
+}
+
+// ── render ────────────────────────────────────────────────────────────────
+function render(){
+  const app=$('app')
+  if(!currentUser){app.innerHTML=renderAuth();return}
+  if(S.view==='home')app.innerHTML=renderHome()
+  else if(S.view==='detail')app.innerHTML=renderDetail()
+  else if(S.view==='form')app.innerHTML=renderForm()
+}
+
+// ── AUTH SCREEN ───────────────────────────────────────────────────────────
+function renderAuth(){
+  return`<div class="auth-wrap">
+    <div class="auth-logo">🍞</div>
+    <div class="auth-title">Bakebook</div>
+    <div class="auth-sub">Your personal baking cookbook.<br>Sign in to access your recipes on any device.</div>
+    <div class="auth-box">
+      <span class="flabel" style="margin-top:0">Email</span>
+      <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email"
+        onkeydown="if(event.key==='Enter')signIn()">
+      <span class="flabel">Password</span>
+      <input type="password" id="auth-pwd" placeholder="••••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter')signIn()">
+      <div id="auth-msg" class="auth-err"></div>
+      <button class="btn-amber btn-full" onclick="signIn()" style="margin-top:6px">Sign in</button>
+      <div class="auth-divider">— or —</div>
+      <button class="btn-ghost btn-full" onclick="signUp()">Create account</button>
+    </div>
+  </div>`
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────
+function renderHome(){
+  const recipes=S.recipes
+  const name=currentUser.email.split('@')[0]
+  const tl=recipes.length>1?renderTimeline(recipes):''
+  const cards=recipes.length
+    ?recipes.map((r,i)=>renderCard(r,i)).join('')
+    :`<div class="empty">
+        <i class="ti ti-notebook" aria-hidden="true"></i>
+        <div class="empty-title">Your cookbook is empty</div>
+        <div class="empty-sub">Add your first recipe — upload screenshots from a 小红书 post or write one manually.</div>
+        <button class="btn-amber" onclick="go('add')" style="margin-top:4px"><i class="ti ti-plus" aria-hidden="true"></i>Add first recipe</button>
+      </div>`
+  return`<div class="bar">
+    <div class="bar-title"><i class="ti ti-bread" aria-hidden="true"></i>Bakebook</div>
+    <div class="bar-r">
+      <span class="user-badge">${esc(name)}</span>
+      <button class="btn-icon" onclick="signOut()" title="Sign out" aria-label="Sign out"><i class="ti ti-logout" aria-hidden="true"></i></button>
+      <button class="btn-amber" onclick="go('add')"><i class="ti ti-plus" aria-hidden="true"></i>New</button>
+    </div>
+  </div>${tl}<div class="grid">${cards}</div>`
+}
+
+function renderTimeline(recipes){
+  const sorted=[...recipes].sort((a,b)=>new Date(a.date)-new Date(b.date))
+  const dots=sorted.map((r,i)=>`
+    <div class="tl-item" onclick='openRecipe("${r.id}")'>
+      ${i>0?'<div class="tl-line"></div>':''}
+      <div class="tl-dot-wrap">
+        <div class="tl-dot"></div>
+        <div class="tl-label">${fmtDate(r.date)}</div>
+        <div class="tl-name">${esc(r.title||'Untitled')}</div>
+      </div>
+    </div>`).join('')
+  return`<div class="tl"><div class="tl-inner">${dots}</div></div>`
+}
+
+// Cards use images directly from the index — no extra db.load() needed
+function renderCard(m,i){
+  const p=placeholderColors[i%placeholderColors.length]
+  const imgs=m.images||[]
+  const img=imgs.length
+    ?`<img src="${esc(imgs[0])}" alt="${esc(m.title)}" loading="lazy">${imgs.length>1?`<div class="card-badge">+${imgs.length-1}</div>`:''}`
+    :`<div class="card-img-icon" style="color:${p.icon}"><i class="ti ti-bread" aria-hidden="true"></i></div>`
+  return`<div class="card" onclick='openRecipe("${m.id}")'>
+    <div class="card-img" style="background:${p.bg}">${img}</div>
+    <div class="card-body">
+      <div class="card-title">${esc(m.title||'Untitled')}</div>
+      <div class="card-meta">
+        <span><i class="ti ti-calendar" aria-hidden="true"></i>${fmtDate(m.date)}</span>
+        ${m.bakingTime>0?`<span><i class="ti ti-clock" aria-hidden="true"></i>${fmtTime(m.bakingTime)}</span>`:''}
+        ${m.calories>0?`<span><i class="ti ti-flame" aria-hidden="true"></i>${m.calories} cal</span>`:''}
+      </div>
+    </div>
+  </div>`
+}
+
+// ── DETAIL ────────────────────────────────────────────────────────────────
+function renderDetail(){
+  const r=S.recipe
+  const imgs=r.images||[]
+  const idx=S.imgIndex
+  let gallery=''
+  if(imgs.length){
+    const arrows=imgs.length>1?`
+      <button class="gallery-arrow prev" onclick="galNav(-1)"><i class="ti ti-chevron-left" aria-hidden="true"></i></button>
+      <button class="gallery-arrow next" onclick="galNav(1)"><i class="ti ti-chevron-right" aria-hidden="true"></i></button>
+      <div class="gallery-count">${idx+1} / ${imgs.length}</div>`:''
+    gallery=`<div class="gallery"><img src="${esc(imgs[idx])}" alt="Recipe photo">${arrows}</div>`
+    if(imgs.length>1)gallery+=`<div class="thumb-strip">${imgs.map((im,i)=>`<img class="thumb-img ${i===idx?'active':''}" src="${esc(im)}" onclick="galSet(${i})" loading="lazy">`).join('')}</div>`
+  }else{
+    gallery=`<div class="gallery-empty">🍞</div>`
+  }
+  const steps=[...(r.steps||[])].sort((a,b)=>a.order-b.order)
+  let elapsed=0
+  const stepHtml=steps.map((s,i)=>{
+    const t=elapsed;elapsed+=(parseInt(s.duration)||0)
+    return`<div class="step-item">
+      <div class="step-left">
+        <div class="step-dot"></div>
+        <div class="step-time">${t}m</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">Step ${s.order}${s.duration>0?`<span class="step-dur">${fmtTime(s.duration)}</span>`:''}</div>
+        <div class="step-desc">${esc(s.description)}</div>
+        ${s.tip?`<div class="step-tip">💡 ${esc(s.tip)}</div>`:''}
+      </div>
+    </div>`}).join('')
+  const ings=(r.ingredients||[]).map(i=>`
+    <div class="ing-row">
+      <div class="ing-dot"></div>
+      <div class="ing-amt">${esc(i.amount)}${i.unit?' '+esc(i.unit):''}</div>
+      <div class="ing-name">${esc(i.name)}</div>
+    </div>`).join('')
+  return`<div class="bar">
+    <button class="btn-icon" onclick="go('home')"><i class="ti ti-arrow-left" aria-hidden="true"></i></button>
+    <div class="bar-r">
+      <button class="btn-ghost" onclick='go("edit",S.recipe)'><i class="ti ti-edit" aria-hidden="true"></i>Edit</button>
+      <button class="btn-icon" id="del-btn" onclick="delRecipe()"><i class="ti ti-trash" aria-hidden="true"></i></button>
+    </div>
+  </div>
+  ${gallery}
+  <div class="detail-body">
+    <div class="detail-title">${esc(r.title||'Untitled recipe')}</div>
+    ${r.description?`<div class="detail-desc">${esc(r.description)}</div>`:''}
+    ${r.source?`<div class="detail-source"><i class="ti ti-link" aria-hidden="true" style="color:var(--a)"></i>${r.source.startsWith('http')?`<a href="${esc(r.source)}" target="_blank" rel="noopener">View original post ↗</a>`:`<span style="color:var(--muted)">${esc(r.source)}</span>`}</div>`:''}
+    <div class="stats-grid">
+      ${[{icon:'ti-calendar',v:fmtDate(r.date),l:'Date'},{icon:'ti-clock',v:fmtTime(r.bakingTime),l:'Time'},{icon:'ti-users',v:r.servings||'—',l:'Serves'},{icon:'ti-flame',v:r.calories||'—',l:'Cal/serving'}]
+        .map(s=>`<div class="stat-box"><i class="ti ${s.icon} stat-icon" aria-hidden="true"></i><span class="stat-val">${s.v}</span><span class="stat-lbl">${s.l}</span></div>`).join('')}
+    </div>
+    ${ings?`<div class="section-title">Ingredients</div><div class="ing-list">${ings}</div>`:''}
+    ${stepHtml?`<div class="section-title">Baking timeline</div><div class="steps"><div class="step-line"></div>${stepHtml}</div>`:''}
+    ${r.notes?`<div class="section-title">Notes</div><div class="notes-box">${esc(r.notes)}</div>`:''}
+    ${r.tags?.length?`<div class="tags-row">${r.tags.map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div>`:''}
+  </div>`
+}
+
+function galNav(d){S.imgIndex=(S.imgIndex+d+(S.recipe.images||[]).length)%(S.recipe.images||[]).length;render()}
+function galSet(i){S.imgIndex=i;render()}
+
+async function delRecipe(){
+  const btn=$('del-btn')
+  if(btn&&btn.dataset.confirm){
+    try{await db.del(S.recipe.id);await go('home')}
+    catch(e){alert('Could not delete: '+e.message)}
+  }else{
+    if(btn){btn.style.color='var(--red)';btn.innerHTML='<i class="ti ti-trash" aria-hidden="true"></i> Confirm?';btn.dataset.confirm='1'}
+  }
+}
+
+// ── FORM ──────────────────────────────────────────────────────────────────
+function renderForm(){
+  const f=S.form
+  const thumbs=S.formFiles.map((fi,i)=>`<div class="form-thumb">
+    <img src="${esc(fi.dataUrl||fi.url)}" alt="Photo ${i+1}">
+    <button class="form-thumb-del" onclick="removeThumb(${i})">×</button>
+  </div>`).join('')
+  const ings=(f.ingredients||[]).map((ing,i)=>`
+    <div class="ing-edit-row">
+      <input class="w-amt" type="text" value="${esc(ing.amount)}" placeholder="200" oninput="upIng(${i},'amount',this.value)">
+      <select class="w-unit" onchange="upIng(${i},'unit',this.value)">
+        ${['g','kg','ml','L','cup','tbsp','tsp','oz','lb','pc','clove','pinch','handful',''].map(u=>`<option${ing.unit===u?' selected':''}>${u||'—'}</option>`).join('')}
+      </select>
+      <input type="text" value="${esc(ing.name)}" placeholder="Ingredient" oninput="upIng(${i},'name',this.value)" style="flex:1">
+      <button class="del-btn" onclick="delIng(${i})"><i class="ti ti-x" aria-hidden="true" style="font-size:16px"></i></button>
+    </div>`).join('')
+  const stps=(f.steps||[]).map((s,i)=>`
+    <div class="step-edit">
+      <div class="step-edit-row">
+        <div class="step-num-badge">${s.order}</div>
+        <textarea rows="2" placeholder="Step ${s.order}…" oninput="upStep(${i},'description',this.value)" style="flex:1;min-height:60px">${esc(s.description)}</textarea>
+        <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;width:60px">
+          <div style="font-size:10px;color:var(--hint);text-align:center">min</div>
+          <input type="number" value="${s.duration||0}" min="0" style="text-align:center;padding:8px 4px" oninput="upStep(${i},'duration',+this.value||0)">
+        </div>
+        <button class="del-btn" onclick="delStep(${i})"><i class="ti ti-x" aria-hidden="true" style="font-size:16px"></i></button>
+      </div>
+      <input type="text" value="${esc(s.tip||'')}" placeholder="💡 Optional tip…" style="margin-top:8px;font-size:14px;padding:9px 10px" oninput="upStep(${i},'tip',this.value)">
+    </div>`).join('')
+  return`<div class="bar">
+    <button class="btn-ghost" onclick="go('home')"><i class="ti ti-x" aria-hidden="true"></i>Cancel</button>
+    <div style="font-size:15px;font-weight:500">${f.title?'Edit recipe':'New recipe'}</div>
+    <button class="btn-amber" onclick="saveForm()">Save</button>
+  </div>
+  <div class="form-body">
+    <div class="fsec">
+      <div class="fsec-title"><i class="ti ti-camera" aria-hidden="true" style="color:var(--a)"></i>Add photos</div>
+      <div class="fsec-desc">Upload screenshots from a 小红书 post — Claude reads all slides and extracts the recipe.</div>
+      <div class="drop-zone" id="drop-zone" onclick="$('file-in').click()" ondragover="dzOver(event)" ondragleave="dzOut()" ondrop="dzDrop(event)">
+        <i class="ti ti-photo-up" aria-hidden="true"></i>
+        Tap to upload screenshots · multiple files OK
+      </div>
+      <input type="file" id="file-in" accept="image/*" multiple style="display:none" onchange="addFiles(this.files)">
+      ${thumbs?`<div class="thumb-row">${thumbs}</div>`:''}
+      ${S.formFiles.some(f=>f.isNew)?`<button class="btn-amber" id="scan-btn" onclick="doScan()" style="margin-top:12px;width:100%;justify-content:center">
+        <i class="ti ti-sparkles" aria-hidden="true"></i>Extract recipe from images
+      </button>`:''}
+      ${S.scanStatus?`<div class="status-line s-info">⏳ ${S.scanStatus}</div>`:''}
+      ${S.scanErr?`<div class="status-line s-err">❌ ${S.scanErr}</div>`:''}
+    </div>
+    <div class="fsec">
+      <div class="fsec-title"><i class="ti ti-clipboard-text" aria-hidden="true" style="color:var(--a)"></i>Paste post text</div>
+      <div class="fsec-desc">Copy the text from the post (any language — Claude translates it).</div>
+      <textarea id="paste-area" rows="4" placeholder="Paste the full post text here…" style="font-size:15px"></textarea>
+      <button class="btn-ghost" onclick="doTextExtract()" style="margin-top:8px;width:100%;justify-content:center">
+        Extract from text <i class="ti ti-arrow-right" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="fsec">
+      <div class="fsec-title"><i class="ti ti-forms" aria-hidden="true" style="color:var(--a)"></i>Recipe details</div>
+      <span class="flabel">Title *</span>
+      <input type="text" value="${esc(f.title)}" placeholder="e.g. Matcha chiffon cake" oninput="S.form.title=this.value">
+      <span class="flabel">Description</span>
+      <textarea rows="2" placeholder="Short description…" oninput="S.form.description=this.value">${esc(f.description)}</textarea>
+      <span class="flabel">Source / link</span>
+      <input type="url" value="${esc(f.source)}" placeholder="小红书 URL or source name" oninput="S.form.source=this.value">
+      <div class="nums-grid" style="margin-top:12px">
+        <div><span class="flabel">Date</span><input type="date" value="${f.date}" oninput="S.form.date=this.value"></div>
+        <div><span class="flabel">Total time (min)</span><input type="number" value="${f.bakingTime}" min="0" oninput="S.form.bakingTime=+this.value||0"></div>
+        <div><span class="flabel">Servings</span><input type="number" value="${f.servings}" min="1" oninput="S.form.servings=+this.value||1"></div>
+        <div><span class="flabel">Cal / serving</span><input type="number" value="${f.calories}" min="0" oninput="S.form.calories=+this.value||0"></div>
+      </div>
+    </div>
+    <div class="fsec">
+      <div class="fsec-title"><i class="ti ti-list" aria-hidden="true" style="color:var(--a)"></i>Ingredients</div>
+      <div id="ing-list">${ings}</div>
+      <button class="add-row-btn" onclick="addIng()"><i class="ti ti-plus" aria-hidden="true"></i>Add ingredient</button>
+    </div>
+    <div class="fsec">
+      <div class="fsec-title"><i class="ti ti-timeline" aria-hidden="true" style="color:var(--a)"></i>Baking steps</div>
+      <div id="step-list">${stps}</div>
+      <button class="add-row-btn" onclick="addStep()"><i class="ti ti-plus" aria-hidden="true"></i>Add step</button>
+    </div>
+    <div class="fsec">
+      <span class="flabel" style="margin-top:0">Notes & tips</span>
+      <textarea rows="3" placeholder="Tips, storage notes, extra info…" oninput="S.form.notes=this.value">${esc(f.notes)}</textarea>
+      <span class="flabel">Tags (comma separated)</span>
+      <input type="text" value="${(f.tags||[]).join(', ')}" placeholder="bread, matcha, beginner…" oninput="S.form.tags=this.value.split(',').map(t=>t.trim()).filter(Boolean)">
+    </div>
+  </div>`
+}
+
+// ── form actions ──────────────────────────────────────────────────────────
+function dzOver(e){e.preventDefault();$('drop-zone')&&($('drop-zone').style.borderColor='var(--a)')}
+function dzOut(){$('drop-zone')&&($('drop-zone').style.borderColor='')}
+function dzDrop(e){e.preventDefault();dzOut();addFiles(e.dataTransfer.files)}
+
+async function addFiles(files){
+  if(!files||!files.length)return
+  S.scanStatus='Reading images…';S.scanErr='';render()
+  try{
+    const newFiles=await Promise.all([...files].map(readAndCompress))
+    S.formFiles=[...S.formFiles,...newFiles]
+    S.scanStatus=''
+  }catch(e){S.scanErr='Could not load image: '+e.message;S.scanStatus=''}
+  render()
+}
+
+function removeThumb(i){S.formFiles.splice(i,1);render()}
+
+async function doScan(){
+  const newFiles=S.formFiles.filter(f=>f.isNew)
+  if(!newFiles.length)return
+  const totalKB=newFiles.reduce((s,f)=>s+(f.sizeKB||0),0)
+  S.scanStatus=`Sending ${newFiles.length} image${newFiles.length>1?'s':''} (~${totalKB} KB) to Claude…`
+  S.scanErr='';render()
+  try{
+    const ex=await extractFromImages(newFiles)
+    mergeExtracted(ex)
+    S.scanStatus=''
+  }catch(e){S.scanErr=e.message;S.scanStatus=''}
+  render()
+}
+
+async function doTextExtract(){
+  const area=$('paste-area')
+  const txt=area?area.value.trim():''
+  if(!txt)return
+  S.scanStatus='Extracting recipe…';S.scanErr='';render()
+  try{
+    const ex=await extractFromText(txt)
+    mergeExtracted(ex)
+    S.scanStatus=''
+  }catch(e){S.scanErr=e.message;S.scanStatus=''}
+  render()
+}
+
+function mergeExtracted(ex){
+  S.form={...S.form,
+    title:ex.title||S.form.title,description:ex.description||S.form.description,
+    source:ex.source||S.form.source,bakingTime:ex.bakingTime||S.form.bakingTime,
+    servings:ex.servings||S.form.servings,calories:ex.calories||S.form.calories,
+    ingredients:(ex.ingredients||[]).length?(ex.ingredients||[]).map(i=>({...i,id:genId()})):S.form.ingredients,
+    steps:(ex.steps||[]).length?(ex.steps||[]).map(s=>({...s,id:genId(),tip:s.tip||''})):S.form.steps,
+    notes:ex.notes||S.form.notes,tags:ex.tags?.length?ex.tags:S.form.tags,
+  }
+}
+
+function upIng(i,k,v){if(S.form.ingredients[i])S.form.ingredients[i][k]=k==='unit'&&v==='—'?'':v}
+function delIng(i){S.form.ingredients.splice(i,1);render()}
+function addIng(){S.form.ingredients.push({id:genId(),name:'',amount:'',unit:'g'});render()}
+function upStep(i,k,v){if(S.form.steps[i])S.form.steps[i][k]=v}
+function delStep(i){S.form.steps.splice(i,1);S.form.steps.forEach((s,j)=>s.order=j+1);render()}
+function addStep(){S.form.steps.push({id:genId(),order:S.form.steps.length+1,description:'',duration:10,tip:''});render()}
+
+async function saveForm(){
+  if(!S.form.title.trim()){alert('Please add a recipe title.');return}
+  S.scanStatus='Uploading photos…';S.scanErr='';render()
+  try{
+    // 1. Upload any new images to Supabase Storage, get back public URLs
+    const imageUrls=await uploadImages(S.formFiles)
+    S.scanStatus='Saving recipe…';render()
+    // 2. Save the recipe with those URLs (not base64)
+    const recipe={...S.form,images:imageUrls}
+    await db.save(recipe)
+    // 3. Refresh and navigate to the saved recipe
+    await refresh()
+    S.recipe=recipe
+    S.scanStatus=''
+    go('detail',recipe)
+  }catch(e){
+    S.scanErr='Save failed: '+e.message
+    S.scanStatus=''
+    render()
+  }
+}
+
+// ── expose functions to window so inline onclick handlers can reach them ──
+// (needed because this is an ES module — functions aren't global by default)
+Object.assign(window,{
+  go,openRecipe,galNav,galSet,delRecipe,
+  addFiles,doScan,doTextExtract,removeThumb,
+  addIng,upIng,delIng,addStep,upStep,delStep,
+  saveForm,dzOver,dzOut,dzDrop,
+  signIn,signUp,signOut,
+  $,S
+})
+
+// ── init ──────────────────────────────────────────────────────────────────
+// Listen for auth changes (sign in, sign out, session refresh)
+supabase.auth.onAuthStateChange(async(event,session)=>{
+  currentUser=session?.user??null
+  if(currentUser&&event==='SIGNED_IN'){
+    try{await refresh()}catch(e){console.error('Refresh error:',e)}
+  }
+  if(!currentUser){S.view='home';S.recipes=[]}
+  render()
+})
+
+// Race getSession against a 6-second timeout so a slow/paused Supabase
+// project never leaves the user stuck on the loading screen.
+const race=ms=>new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms))
+try{
+  const{data:{session}}=await Promise.race([supabase.auth.getSession(),race(6000)])
+  currentUser=session?.user??null
+  if(currentUser){
+    try{await Promise.race([refresh(),race(8000)])}
+    catch(e){console.error('Load recipes error:',e)}
+  }
+}catch(e){
+  // timeout or network error — fall through to login screen
+  console.warn('Supabase init:',e.message)
+}finally{
+  render() // always called, even if everything above failed
+}
+</script>
+</body>
+</html>
