@@ -34,7 +34,8 @@ exports.handler = async function(event) {
     const upstream = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${key}` },
-      body: JSON.stringify({ model:'meta-llama/llama-4-scout-17b-16e-instruct', messages, max_tokens: body.max_tokens || 1500, temperature: 0.1 })
+      body: JSON.stringify({ model:'qwen/qwen3.6-27b', messages, max_tokens: body.max_tokens || 1500, temperature: 0.1 })
+      
     })
 
     const data = await upstream.json()
