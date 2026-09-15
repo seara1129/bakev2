@@ -303,34 +303,20 @@ function extractJSON(text){
 }
 
 async function callClaude(messages,maxTokens=1500){
-  // Call Groq directly from the browser — Groq supports CORS so no proxy needed.
-  // Convert Anthropic-style messages → OpenAI format that Groq uses.
-  const GROQ_KEY='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'
-  const groqMessages=messages.map(msg=>{
-    const blocks=Array.isArray(msg.content)?msg.content:[{type:'text',text:String(msg.content||'')}]
-    return{
-      role:msg.role||'user',
-      content:blocks.map(b=>b.type==='image'
-        ?{type:'image_url',image_url:{url:`data:${b.source.media_type};base64,${b.source.data}`}}
-        :{type:'text',text:String(b.text||'')}
-      )
-    }
-  })
   let body
-  try{body=JSON.stringify({model:'meta-llama/llama-4-scout-17b-16e-instruct',messages:groqMessages,max_tokens:maxTokens,temperature:0.1})}
+  try{body=JSON.stringify({model:'unused',max_tokens:maxTokens,messages})}
   catch(e){throw new Error('Request too large')}
   return new Promise((resolve,reject)=>{
     const xhr=new XMLHttpRequest()
-    xhr.open('POST','https://api.groq.com/openai/v1/chat/completions')
+    xhr.open('POST','/.netlify/functions/extract')
     xhr.setRequestHeader('Content-Type','application/json')
-    xhr.setRequestHeader('Authorization','Bearer '+GROQ_KEY)
     xhr.timeout=90000
     xhr.onload=()=>{
       try{
         const d=JSON.parse(xhr.responseText)
         if(d.error){reject(new Error(d.error.message));return}
-        resolve(d.choices?.[0]?.message?.content||'')
-      }catch(e){reject(new Error('Could not parse response'))}
+        resolve(d.choices?.[0]?.message?.content||d.content?.[0]?.text||'')
+      }catch(e){reject(new Error('Could not parse response: '+xhr.responseText.slice(0,100)))}
     }
     xhr.onerror=()=>reject(new Error('Network error — check your connection'))
     xhr.ontimeout=()=>reject(new Error('Timed out — try the Paste text option instead'))
